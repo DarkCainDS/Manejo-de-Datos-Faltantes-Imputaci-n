@@ -1,0 +1,30 @@
+def missing_mosaic_plot(
+        self,
+        target_var: str,
+        x_categorical_var: str,
+        y_categorical_var: str,
+        ax = None
+    ):
+        return (
+            self._obj
+            .assign(
+                **{target_var: lambda df: df.weight.isna().replace([True, False], ["NA", "!NA"])}
+            )
+            .groupby(
+                [x_categorical_var, y_categorical_var, target_var],
+                dropna=False,
+                as_index=True,
+            )
+            .size()
+            .pipe(
+                lambda df: mosaic(
+                    data=df,
+                    properties=lambda key: {"color": "r" if "NA" in key else "gray"},
+                    ax=ax,
+                    horizontal=True,
+                    axes_label=True,
+                    title="",
+                    labelizer=lambda key: "",
+                )
+            )
+        )
